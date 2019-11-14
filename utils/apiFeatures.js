@@ -14,7 +14,7 @@ class APIFeatures {
 
     this.query = this.query.find(JSON.parse(queryStr));
 
-    return this
+    return this;
   }
 
   sort() {

@@ -25,8 +25,8 @@ const tourSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Must have difficulty'],
     enum: {
-      values: ['easy', 'medium', 'hard'],
-      message: 'Difficulty must have one of these values: easy, medium, hard'
+      values: ['easy', 'medium', 'difficult'],
+      message: 'Difficulty must have one of these values: easy, medium, difficult'
     }
   },
   ratingsAverage: {
@@ -65,7 +65,7 @@ const tourSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Must have imageCover']
   },
-  images: String,
+  images: [String],
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -101,6 +101,7 @@ tourSchema.pre(/^find/, function(next) {
 
 tourSchema.post(/^find/, function(docs, next) {
   console.log(`Query to DB took ${Date.now() - this.start} milliseconds`);
+  next();
 });
 
 tourSchema.pre("aggregate", function(next) {
