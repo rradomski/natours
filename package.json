@@ -2,11 +2,14 @@
   "name": "natours",
   "version": "1.0.0",
   "description": "Learning Node Express MongoDB",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "nodemon run server.js"
+    "start": "nodemon server.js",
+    "start:prod": "set NODE_ENV=production&& nodemon server.js",
+    "debug": "ndb server.js",
+    "debug:prod": "set NODE_ENV=production&& ndb server.js"
   },
-  "author": "Me",
+  "author": "Rafał Radomski",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.2.0",

@@ -86,7 +86,7 @@ tourSchema.virtual('durationWeeks').get(function() {
 });
 
 tourSchema.pre('save', function(next) {
-  this.slug = slugify(this.name, { lover: true });
+  this.slug = slugify(this.name, { lower: true });
   next();
 });
 
