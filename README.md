@@ -6,6 +6,8 @@ For now it is only API to access tours form database but in future there is goin
 
 ## run
 
+Before running the app. Look at `config.env` to provide some configuration data.
+
 To run app use `node server.js` or using nodemon `nodemon start`.  
 It requires MongoDB service on port 27017 and created database named `natours`.
 
