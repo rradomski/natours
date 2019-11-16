@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const tourController = require('./../controllers/tourController');
+const authController = require('./../controllers/authController');
 
 router
   .route('/top-5-cheap')
@@ -15,13 +16,17 @@ router
 
 router
   .route('/')
-  .get(tourController.getTours)
+  .get(authController.protect, tourController.getTours)
   .post(tourController.createTour);
 
 router
   .route('/:id')
   .get(tourController.getTour)
   .patch(tourController.updateTour)
-  .delete(tourController.deleteTour);
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.deleteTour
+  );
 
 module.exports = router;
