@@ -8,18 +8,18 @@ const tourSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     maxlength: [40, 'Name is too long'],
-    minlength: [10, 'Name is too short'],
+    minlength: [10, 'Name is too short']
   },
   slug: {
-    type: String,
+    type: String
   },
   duration: {
     type: Number,
-    required: [true, 'Must have duration'],
+    required: [true, 'Must have duration']
   },
   maxGroupSize: {
     type: Number,
-    required: [true, 'Must have maxGroupSize'],
+    required: [true, 'Must have maxGroupSize']
   },
   difficulty: {
     type: String,
@@ -34,6 +34,7 @@ const tourSchema = new mongoose.Schema({
     default: 4.5,
     min: [1, 'Must be higher or equal 1'],
     max: [5, 'Must be lower or equal 5'],
+    set: value => Math.fround(value)
   },
   ratingsQuantity: {
     type: Number,
@@ -75,14 +76,53 @@ const tourSchema = new mongoose.Schema({
   secretTour: {
     type: Boolean,
     default: false
-  }
+  },
+  startLocation: {
+    type: {
+      type: String,
+      default: 'Point',
+      enum: ['Point']
+    },
+    coordinates: [Number],
+    address: String,
+    description: String
+  },
+  locations: [
+    {
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+      dat: Number
+    }
+  ],
+  guides: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User'
+    }
+  ]
 }, {
   toJSON: { virtuals: true },
-  toObject: { virtuals: true },
+  toObject: { virtuals: true }
 });
+
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere'});
 
 tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
+});
+
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
 });
 
 tourSchema.pre('save', function(next) {
@@ -99,15 +139,28 @@ tourSchema.pre(/^find/, function(next) {
   console.error(error.message);
 });
 
+tourSchema.pre(/^find/, function(next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt'
+  });
+
+  next();
+});
+
 tourSchema.post(/^find/, function(docs, next) {
   console.log(`Query to DB took ${Date.now() - this.start} milliseconds`);
   next();
 });
 
-tourSchema.pre("aggregate", function(next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-
-  console.log(this.pipeline());
+tourSchema.pre('aggregate', function(next) {
+  const pipeline = this.pipeline();
+  let el;
+  pipeline.forEach((val, index) => {
+    if (val['$geoNear']) [el] = pipeline.splice(index, 1);
+  });
+  pipeline.unshift({ $match: { secretTour: { $ne: true } } });
+  if (el) pipeline.unshift(el);
   next();
 });
 
