@@ -22,11 +22,9 @@ const createAndSendToken = (user, statusCode, res) => {
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
 
-  res.cookie('jwt', token, cookieOptions);
-
   user.password = undefined;
 
-  res.status(statusCode).json({
+  res.status(statusCode).cookie('jwt', token, cookieOptions).json({
     status: 'success',
     token: token,
     data: {
@@ -63,7 +61,9 @@ exports.login = catchAsync(async (req, res, next) => {
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
-  if (
+  if (req.cookies.jwt) {
+    token = req.cookies.jwt;
+  } else if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
@@ -82,9 +82,40 @@ exports.protect = catchAsync(async (req, res, next) => {
     'Password changed. Log in again.'
   ));
 
+  res.locals.user = freshUser;
   req.user = freshUser;
   next();
 });
+
+exports.logout = (req, res) => {
+  res.status(200)
+    .cookie('jwt', 'loggedout', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true
+    })
+    .json({
+      status:
+        'success'
+    });
+};
+
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    if (req.cookies.jwt) {
+      const decoded = await promisify(jwt.verify)(req.cookies.jwt, process.env.JWT_SECRET);
+
+      const freshUser = await User.findById(decoded.id);
+      if (!freshUser) return next();
+
+      if (freshUser.changedPasswordAfter(decoded.iat)) return next();
+
+      res.locals.user = freshUser;
+    }
+  }catch (err) {
+    return next();
+  }
+  next();
+};
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {

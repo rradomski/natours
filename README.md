@@ -1,8 +1,7 @@
 # natours
 
 This is my course Node Express app using MongoDB. 
-It is website that shows tours around the city. 
-For now it is only API to access tours form database but in future there is going to be full client app.
+It is website that shows tours around the world. 
 
 ## run
 
