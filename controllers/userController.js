@@ -20,6 +20,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) return next(
     new AppError('Cannot update password here. Use /updateMyPassword instead', 400));
 
+  console.log(req.body);
   const filteredBody = filterObj(req.body, 'name', 'email');
   const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
