@@ -16,20 +16,20 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
+const bookingController = require('./controllers/bookingController');
 
 const app = express();
 
 dotenv.config({ path: './config.env' });
-const corsOptions = {
-  origin: [`${process.env.BASE_URL}:${process.env.PORT}`, `${process.env.BASE_URL}:${process.env.PORT}/api/v1/`]
-};
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use(cors(corsOptions));
+app.use(cors());
+app.options('*', cors());
 app.use(helmet());
 
 if (process.env.NODE_ENV === 'development') {
@@ -47,6 +47,10 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
 });
+
+app.post('/webhook-checkout',
+  express.raw({type: 'application/json'}),
+  bookingController.webhookCheckout);
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
@@ -77,6 +81,7 @@ app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find path for: ${req.originalUrl}.`));

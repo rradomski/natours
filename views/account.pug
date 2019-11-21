@@ -13,7 +13,7 @@ block content
       nav.user-view__menu
         ul.side-nav
           +navItem('#', 'Settings', 'settings', true)
-          +navItem('#', 'My bookings', 'briefcase')
+          +navItem('/my-tours', 'My bookings', 'briefcase')
           +navItem('#', 'My reviews', 'star')
           +navItem('#', 'Billing', 'credit-card')
         - if(user.role === 'admin')
@@ -29,7 +29,7 @@ block content
         .user-view__form-container
           h2.heading-secondary.ma-bt-md Your account settings
           //- Using HTML Form
-          //- form.form.form-user-data(action='/submit-user-data', method='POST')
+          //- form.form.form-user-data(action='/submit-user-data', method='POST', enctype='multipart/form-data)
           //- Using API Call
           form.form.form-user-data
             .form__group
@@ -40,7 +40,8 @@ block content
               input#email.form__input(type='email', value=`${user.email}`, required, name='email')
             .form__group.form__photo-upload
               img.form__user-photo(src=`/img/users/${user.image}`, alt='User photo')
-              a.btn-text(href='') Choose new photo
+              input#image.form__upload(type='file', accept='image/*', name='image')
+              label(for='image') Choose your image
             .form__group.right
               button.btn.btn--small.btn--green Save settings
         .line &nbsp;

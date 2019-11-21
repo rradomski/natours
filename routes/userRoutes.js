@@ -37,6 +37,8 @@ router.get(
 );
 router.patch(
   '/updateMe',
+  userController.uploadImage,
+  userController.processUserImage,
   userController.updateMe
 );
 router.delete(
