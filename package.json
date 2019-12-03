@@ -9,6 +9,7 @@
     "debug": "ndb server.js",
     "debug:prod": "set NODE_ENV=production&& ndb server.js",
     "import-data": "node dev-data/data/import-dev-data.js --delete&& node dev-data/data/import-dev-data.js --import",
+    "import-data:prod": "set NODE_ENV=production&& node dev-data/data/import-dev-data.js --delete&& node dev-data/data/import-dev-data.js --import",
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
     "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundle.js"
   },
@@ -44,6 +45,6 @@
     "prettier": "^1.18.2"
   },
   "engines": {
-    "node": "^10"
+    "node": "10.16.3"
   }
 }
