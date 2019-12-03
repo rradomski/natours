@@ -7,7 +7,13 @@ const Review = require('./../../models/reviewModel');
 
 dotenv.config({ path: './config.env' });
 
-const DB = process.env.DATABASE_LOCAL;
+let DB;
+if (process.env.NODE_ENV === 'production') {
+  DB = process.env.DATABASE_REMOTE;
+  DB = DB.replace('<password>', process.env.DATABASE_REMOTE_PASSWORD);
+} else {
+  DB = process.env.DATABASE_LOCAL;
+}
 
 mongoose.connect(DB, {
   useNewUrlParser: true,

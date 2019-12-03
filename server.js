@@ -9,7 +9,13 @@ process.on('uncaughtException', err => {
 dotenv.config({ path: './config.env' });
 const app = require('./app');
 
-const DB = process.env.DATABASE_LOCAL;
+let DB;
+if (process.env.NODE_ENV === 'production') {
+  DB = process.env.DATABASE_REMOTE;
+  DB = DB.replace('<password>', process.env.DATABASE_REMOTE_PASSWORD);
+} else {
+  DB = process.env.DATABASE_LOCAL;
+}
 
 mongoose.connect(DB, {
   useNewUrlParser: true,
@@ -17,7 +23,7 @@ mongoose.connect(DB, {
   useFindAndModify: false,
   useUnifiedTopology: true
 }).then(() => console.log('Database connection established'))
-  .catch(err => console.error(err.message));
+    .catch(err => console.error(err.message));
 
 
 const PORT = process.env.PORT || 3000;
