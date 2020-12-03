@@ -18,9 +18,7 @@ commands:
               exit 1
             else
               echo "Heroku API key found."
-            <<#parameters.print-whoami>>
               heroku auth:whoami
-            <</parameters.print-whoami>>
             fi
             name: Verify HEROKU_API_KEY is set
   install:
@@ -65,9 +63,9 @@ commands:
                 name: Login to Heroku Docker image registry
             - run:
                 command: |
-                    heroku container:push -a <<parameters.app-name>> \
-                    <<# parameters.recursive >>--recursive<</ parameters.recursive >>
-                    <<# parameters.process-types>><<parameters.process-types>><</ parameters.process-types>>
+                  heroku container:push -a <<parameters.app-name>> \
+                  <<# parameters.recursive >>--recursive<</ parameters.recursive >>
+                  <<# parameters.process-types>><<parameters.process-types>><</ parameters.process-types>>
                 name: Push Docker image to Heroku
                 no_output_timeout: 10m
   release-docker-image:
