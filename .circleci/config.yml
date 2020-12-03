@@ -33,17 +33,17 @@ jobs:
     working_directory: ~/natours
     environment:
       HEROKU_APP: $HEROKU_APP_NAME
-      steps:
-        - checkout
-        - run:
-          name: Setup Heroku
-          command: bash .circleci/setup-heroku.sh # run a script to set up Heroku
-        - run:
-          command: |
-            git push heroku sequential-branch-filter:master
-            heroku run rake db:migrate
-            sleep 5 # sleep for 5 seconds to wait for dynos
-            heroku restart
+    steps:
+      - checkout
+      - run:
+        name: Setup Heroku
+        command: bash .circleci/setup-heroku.sh # run a script to set up Heroku
+      - run:
+        command: |
+          git push heroku sequential-branch-filter:master
+          heroku run rake db:migrate
+          sleep 5 # sleep for 5 seconds to wait for dynos
+          heroku restart
 ##    - run:
 ##        name: Deploy on Heroku Login
 ##        command: heroku login
