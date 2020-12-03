@@ -108,6 +108,8 @@ jobs:
 
     steps:
       - checkout
+      - setup_remote_docker:
+          version: 19.03.13
       - run:
           name: update-npm
           command: 'sudo npm install -g npm@latest'
@@ -143,8 +145,6 @@ jobs:
       - install
       - check-authentication
       - checkout
-      - setup_remote_docker:
-          version: 19.03.13
       - push-docker-image:
           app-name: << parameters.app-name >>
           process-types: web
