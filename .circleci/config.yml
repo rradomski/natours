@@ -139,16 +139,16 @@ jobs:
         default: false
         description: Use this to automatically enable mantainance mode before pre-deploy steps and have it disabled after post-deploy steps have been run.
         type: boolean
-      steps:
-        - install
-        - check-authentication
-        - checkout
-        - push-docker-image:
-            app-name: << parameters.app-name >>
-            process-types: web
-        - release-docker-image:
-            app-name: << parameters.app-name >>
-            process-types: web
+    steps:
+      - install
+      - check-authentication
+      - checkout
+      - push-docker-image:
+          app-name: << parameters.app-name >>
+          process-types: web
+      - release-docker-image:
+          app-name: << parameters.app-name >>
+          process-types: web
   
 ##    - run:
 ##        name: Deploy on Heroku Login
