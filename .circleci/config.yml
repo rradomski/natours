@@ -33,7 +33,7 @@ jobs:
               enabled: true
           working_directory: ~/natours
           environment:
-            HEROKU_APP: "sleepy-refuge-55486" # define env var $HEROKU_APP
+            HEROKU_APP: $HEROKU_APP_NAME
           steps:
             - checkout
             - run:
