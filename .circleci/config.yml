@@ -1,6 +1,28 @@
 # Javascript Node CircleCI 2.1 configuration file
 version: 2.1
 commands:
+  check-authentication:
+    description: |
+      Verifies the Heroku API key has been added so we can authenticate.
+    parameters:
+      print-whoami:
+        default: false
+        description: Print the result of heroku auth:whoami.
+        type: boolean
+    steps:
+      - run:
+          command: |
+            if [[ $HEROKU_API_KEY == "" ]]; then
+              echo "No Heroku API key set, please set the HEROKU_API_KEY environment variable."
+              echo "This can be found by running the `heroku auth:token` command locally."
+              exit 1
+            else
+              echo "Heroku API key found."
+            <<#parameters.print-whoami>>
+              heroku auth:whoami
+            <</parameters.print-whoami>>
+            fi
+            name: Verify HEROKU_API_KEY is set
   install:
     description: |
       Download and install the Heroku CLI. Will be skipped if the CLI is already installed in the system.
@@ -13,6 +35,71 @@ commands:
             echo "Heroku is already installed. No operation was performed."
             fi
           name: Install Heroku CLI (If not installed)
+  push-docker-image:
+        description: |
+            Push a Docker image to the Heroku Docker registry.
+        parameters:
+            api-key:
+                default: HEROKU_API_KEY
+                description: The name of the environment variable containing your Heroku API Key.
+                type: env_var_name
+            app-name:
+                default: $HEROKU_APP_NAME
+                description: The name of your Heroku App. For backwards compatibility the literal value `$HEROKU_APP_NAME` is the default, so you can easily use this command by setting an environment variable called HEROKU_APP_NAME
+                type: string
+            no_output_timeout:
+                default: 10m
+                description: Allows you to specify the no_output_timeout for the `git push` to heroku. Defaults to 10m.
+                type: string
+            process-types:
+                default: ""
+                description: Process types.
+                type: string
+            recursive:
+                default: false
+                description: Push all Dockerfiles in the directory to Heroku.
+                type: boolean
+        steps:
+            - run:
+                command: heroku container:login
+                name: Login to Heroku Docker image registry
+            - run:
+                command: |
+                    heroku container:push -a <<parameters.app-name>> \
+                    <<# parameters.recursive >>--recursive<</ parameters.recursive >>
+                    <<# parameters.process-types>><<parameters.process-types>><</ parameters.process-types>>
+                name: Push Docker image to Heroku
+                no_output_timeout: 10m
+  release-docker-image:
+    description: |
+      Release a Docker image from the Heroku Docker registry.
+    parameters:
+      api-key:
+        default: HEROKU_API_KEY
+        description: The name of the environment variable containing your Heroku API Key.
+        type: env_var_name
+      app-name:
+        default: $HEROKU_APP_NAME
+        description: The name of your Heroku App. For backwards compatibility the literal value `$HEROKU_APP_NAME` is the default, so you can easily use this command by setting an environment variable called HEROKU_APP_NAME
+        type: string
+      no_output_timeout:
+        default: 10m
+        description: Allows you to specify the no_output_timeout for the `git push` to heroku. Defaults to 10m.
+        type: string
+      process-types:
+        default: web
+        description: Process types.
+        type: string
+    steps:
+      - run:
+          command: heroku container:login
+          name: Login to Heroku Docker image registry
+      - run:
+          command: |
+              heroku container:release -a <<parameters.app-name>> \
+              <<parameters.process-types>>
+          name: Push Docker image to Heroku
+          no_output_timeout: 10m
 jobs:
   build:
     working_directory: ~/natours
@@ -80,13 +167,12 @@ jobs:
             <<# parameters.process-types>><<parameters.process-types>><</
             parameters.process-types>>
           name: Push Docker image to Heroku
-          no_output_timeout: << parameters.no_output_timeout >>
+          no_output_timeout: 10m
   
 ##    - run:
 ##        name: Deploy on Heroku Login
 ##        command: heroku login
 ##        command: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
-
 orbs:
   heroku: circleci/heroku@1.2.3    
     
@@ -94,8 +180,7 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-##    - build
-      - install
+      - build
       - deploy:
-##        requires:
-##          - build
+          requires:
+            - build
