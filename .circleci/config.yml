@@ -29,19 +29,23 @@ jobs:
     docker:
       - image: circleci/buildpack-deps:trusty
     steps:
-    - checkout
-    - run:
-        name: Heroku Login
-        command: heroku login
-    - run:
-        name: Heroku Container Login
-        command: heroku container:login
-    - run:
-        name: Heroku Push
-        command: heroku container:push web
-    - run:
-        name: Heroku Release
-        command: heroku container:release web
+      machine:
+              enabled: true
+          working_directory: ~/natours
+          environment:
+            HEROKU_APP: "sleepy-refuge-55486" # define env var $HEROKU_APP
+          steps:
+            - checkout
+            - run:
+                name: Setup Heroku
+                command: bash .circleci/setup-heroku.sh # run a script to set up Heroku
+
+            - run:
+                command: |
+                  git push heroku sequential-branch-filter:master
+                  heroku run rake db:migrate
+                  sleep 5 # sleep for 5 seconds to wait for dynos
+                  heroku restart
 ##    - run:
 ##        name: Deploy on Heroku Login
 ##        command: heroku login
