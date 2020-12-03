@@ -33,7 +33,7 @@ jobs:
     working_directory: ~/natours
     parameters:
       api-key:
-        default: $HEROKU_API_KEY
+        default: HEROKU_API_KEY
         description: The name of the environment variable containing your Heroku API Key.
         type: env_var_name
       app-name:
