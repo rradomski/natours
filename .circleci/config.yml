@@ -56,7 +56,7 @@ commands:
         description: Process types.
         type: string
       recursive:
-        default: false
+        default: true
         description: Push all Dockerfiles in the directory to Heroku.
         type: boolean
     steps:
