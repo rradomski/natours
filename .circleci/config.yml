@@ -27,7 +27,7 @@ jobs:
           command: 'npm run build:js'
   deploy:
     description: |
-    Push a Docker image to the Heroku Docker registry.
+      Push a Docker image to the Heroku Docker registry.
     docker:
       - image: circleci/buildpack-deps:trusty
     working_directory: ~/natours
@@ -59,16 +59,16 @@ jobs:
         type: boolean
     steps:
       - run:
-        command: 'heroku container:login'
-        name: Login to Heroku Docker image registry
+          command: 'heroku container:login'
+          name: Login to Heroku Docker image registry
       - run:
-        command: >
-          heroku container:push -a <<parameters.app-name>> \
-        <<# parameters.recursive >>--recursive<</ parameters.recursive >>
-        <<# parameters.process-types>><<parameters.process-types>><</
-        parameters.process-types>>
-        name: Push Docker image to Heroku
-        no_output_timeout: << parameters.no_output_timeout >>
+          command: >
+            heroku container:push -a <<parameters.app-name>> \
+            <<# parameters.recursive >>--recursive<</ parameters.recursive >>
+            <<# parameters.process-types>><<parameters.process-types>><</
+            parameters.process-types>>
+          name: Push Docker image to Heroku
+          no_output_timeout: << parameters.no_output_timeout >>
 ##    - run:
 ##        name: Deploy on Heroku Login
 ##        command: heroku login
