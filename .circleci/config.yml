@@ -26,8 +26,6 @@ jobs:
           name: build-site-script-file
           command: 'npm run build:js'
   deploy:
-    machine:
-      enabled: true
     docker:
       - image: circleci/buildpack-deps:trusty
     working_directory: ~/natours
