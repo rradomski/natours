@@ -18,9 +18,11 @@ commands:
               exit 1
             else
               echo "Heroku API key found."
+              <<#parameters.print-whoami>>
               heroku auth:whoami
+              <</parameters.print-whoami>>
             fi
-            name: Verify HEROKU_API_KEY is set
+          name: Verify HEROKU_API_KEY is set
   install:
     description: |
       Download and install the Heroku CLI. Will be skipped if the CLI is already installed in the system.
