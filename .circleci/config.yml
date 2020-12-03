@@ -26,10 +26,10 @@ jobs:
           name: build-site-script-file
           command: 'npm run build:js'
   deploy:
-    docker:
-      - image: circleci/buildpack-deps:trusty
     machine:
       enabled: true
+    docker:
+      - image: circleci/buildpack-deps:trusty
     working_directory: ~/natours
     environment:
       HEROKU_APP: $HEROKU_APP_NAME
@@ -40,8 +40,7 @@ jobs:
           command: bash .circleci/setup-heroku.sh # run a script to set up Heroku
       - run:
           command: |
-            git push heroku sequential-branch-filter:master
-            heroku run rake db:migrate
+            git push heroku $HEROKU_APP_NAME:master
             sleep 5 # sleep for 5 seconds to wait for dynos
             heroku restart
 ##    - run:
